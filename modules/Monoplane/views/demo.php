@@ -1,0 +1,4 @@
+
+    <article>
+        {{ $mp['content'] }}
+    </article>
