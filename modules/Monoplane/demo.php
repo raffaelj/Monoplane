@@ -29,12 +29,7 @@ $this->mp['site'] = [
 
 $this->mp['nav'] = [
     [
-        'title' => 'Demo',
-        'navigation' => 'main',
-        'url' => 'https://monoplane.rlj.me',
-    ],
-    [
-        'title' => 'Monoplane (Github)',
+        'title' => 'Source',
         'navigation' => 'main',
         'url' => 'https://github.com/raffaelj/Monoplane',
     ],
@@ -44,20 +39,20 @@ $this->mp['nav'] = [
         'url' => 'https://getcockpit.com/',
     ],
     [
-        'title' => 'Cockpit (Github)',
+        'title' => 'Cockpit Source',
         'navigation' => 'main',
         'url' => 'https://github.com/agentejo/cockpit',
     ],
-    [
-        'title' => 'Imprint',
-        'navigation' => 'footer',
-        'url' => 'https://monoplane.rlj.me/imprint',
-    ],
-    [
-        'title' => 'Privacy',
-        'navigation' => 'footer',
-        'url' => 'https://monoplane.rlj.me/privacy',
-    ],
+    // [
+        // 'title' => 'Imprint',
+        // 'navigation' => 'footer',
+        // 'url' => 'https://monoplane.rlj.me/imprint',
+    // ],
+    // [
+        // 'title' => 'Privacy',
+        // 'navigation' => 'footer',
+        // 'url' => 'https://monoplane.rlj.me/privacy',
+    // ],
     [
         'title' => 'Login',
         'navigation' => 'footer',

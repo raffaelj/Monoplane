@@ -1,1 +1,1 @@
-<p>@lang('built with') <a href="https://github.com/raffaelj/Monoplane">Monoplane</a> - &copy; @lang('since') 2018 <a href="https://www.rlj.me">Raffael Jesche</a></p>
+<p>@lang('built with') <a href="https://github.com/raffaelj/Monoplane">Monoplane</a> - &copy; @lang('since') 2018 <a href="https://www.raffael.one">Raffael Jesche</a></p>
