@@ -197,7 +197,7 @@ If you follow the naming schema above, your classes are in the autoload registry
 
 ## Fast CLI installation
 
-**Don't copy and paste everything!** 
+**Don't copy and paste everything!** Read it, understand and modify it to your needs.
 
 ```bash
 cd html
@@ -243,15 +243,10 @@ cat > config/i18n/de.php <<EOF
 ];
 EOF
 
-# This is the last step, because it requires a user input. You shouldn't copy-paste
-# everything, but it happens...
+# This is the last step, because it requires a user input. 
 
-# create admin user
+# create admin user, type a email, a password and press Enter
 ./mp account/create --user raffael --name Raffael
-
-
-
-# type a password and press Enter
 ```
 
 ## Copyright and License
