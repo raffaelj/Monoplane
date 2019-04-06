@@ -4,6 +4,8 @@ Monoplane is a small PHP front end for the fast and headless [Cockpit CMS][1]. I
 
 Monoplane is in alpha state. Some options may change, but I try my best to keep it backwards compatible. Feel free to file issues or to send pull requests.
 
+[Demo][12]
+
 ## Requirements
 
 * PHP >= 7.0
@@ -28,6 +30,10 @@ make also sure that `$_SERVER['DOCUMENT_ROOT']` exists and is set correctly.
 5. Adjust your settings
 6. Add your content
 7. Change everything, if you don't like the defaults
+
+Now login with admin/admin, change your password and start your work.
+
+If you don't like clicking, use the CLI commands. Scroll down or [click here](#fast-cli-installation) ;-).
 
 ## Settings
 
@@ -189,6 +195,65 @@ class Fancy extends \LimeExtra\Controller {
 
 If you follow the naming schema above, your classes are in the autoload registry and you don't have to include them manually.
 
+## Fast CLI installation
+
+**Don't copy and paste everything!** 
+
+```bash
+cd html
+
+# base
+git clone https://github.com/raffaelj/Monoplane.git .
+git clone https://github.com/agentejo/cockpit.git cockpit
+
+# install addons
+git clone https://github.com/raffaelj/cockpit_UniqueSlugs.git cockpit/addons/UniqueSlugs
+
+# check for dependencies
+./mp check
+
+# Use other cli commands to import collections or singletons
+# All cockpit cli commands should work with `./mp`, but you can call `cockpit/cp` instead, too.
+
+# create cockpit config dir
+mkdir -p cockpit/config
+
+cat > cockpit/config/config.yaml <<EOF
+app.name: Monoplane
+languages:
+    de: Deutsch
+unique_slugs:
+    collections:
+        pages: title
+EOF
+
+# i18n
+mkdir -p cockpit/config/cockpit/i18n
+wget -O cockpit/config/cockpit/i18n/de.php https://raw.githubusercontent.com/agentejo/cockpit-i18n/master/de.php
+
+# Monoplane i18n
+mkdir -p config/i18n
+cat > config/i18n/de.php <<EOF
+<?php return [
+    'Page not found' => 'Seite nicht auffindbar',
+    'Something went wrong. This site doesn\'t exist.' => 'Etwas ist schiefgegangen. Diese Seite existiert nicht.',
+    'back to start page' => 'Zurück zur Startseite',
+    'built with' => 'erstellt mit',
+    'since' => 'seit',
+];
+EOF
+
+# This is the last step, because it requires a user input. You shouldn't copy-paste
+# everything, but it happens...
+
+# create admin user
+./mp account/create --user raffael --name Raffael
+
+
+
+# type a password and press Enter
+```
+
 ## Copyright and License
 
 Copyright 2019 Raffael Jesche under the MIT license.
@@ -213,3 +278,4 @@ I used [highlight.js][9] for code highlighting on the demo page on startup, whic
 [9]: https://highlightjs.org
 [10]: https://github.com/highlightjs/highlight.js/blob/master/LICENSE
 [11]: https://github.com/raffaelj/Monoplane/blob/master/LICENSE
+[12]: https://monoplane.rlj.me

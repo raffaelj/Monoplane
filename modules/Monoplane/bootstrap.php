@@ -94,3 +94,8 @@ $this->on('after', function() {
 if (file_exists(MP_CONFIG_DIR.'/bootstrap.php')) {
     include(MP_CONFIG_DIR.'/bootstrap.php');
 }
+
+// CLI
+if (COCKPIT_CLI) {
+    $this->path('#cli', __DIR__.'/cli');
+}

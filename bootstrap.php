@@ -5,12 +5,12 @@
  * @see       https://github.com/raffaelj/Monoplane
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.2.1
+ * @version   0.2.2
  * @author    Raffael Jesche
  * @license   MIT
  * @note      work in progress
  */
-$version = '0.2.1';
+$version = '0.2.2';
 
 // check for custom defines
 if (file_exists(__DIR__.'/defines.php')) {
@@ -27,6 +27,8 @@ if (!defined('MP_BASE_URL'))      define('MP_BASE_URL',      $BASE_URL === '/' ?
 
 if (!defined('MP_CONFIG_DIR'))    define('MP_CONFIG_DIR',   MP_DOCS_ROOT.'/config');
 if (!defined('MP_CONFIG_PATH'))   define('MP_CONFIG_PATH',  MP_CONFIG_DIR.'/config.php');
+
+if (!defined('COCKPIT_CLI'))      define('COCKPIT_CLI', PHP_SAPI == 'cli');
 
 // for thumbnails of Monoplane assets
 if (!defined('COCKPIT_SITE_DIR'))   define('COCKPIT_SITE_DIR',  MP_DOCS_ROOT);
