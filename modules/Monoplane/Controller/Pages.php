@@ -124,7 +124,8 @@ class Pages extends \LimeExtra\Controller {
 
         $ext = pathinfo($thumbpath, PATHINFO_EXTENSION);
 
-        $thumbpath = 'thumbs:///' . trim(str_replace($this->app->filestorage->getUrl('thumbs://'), '', $thumbpath), '/');
+        $store = $ext == 'svg' ? 'uploads://' : 'thumbs://';
+        $thumbpath = $store . '/' . str_replace($this->app->filestorage->getUrl($store), '', $thumbpath);
 
         $timestamp = $this->app->filestorage->getTimestamp($thumbpath);
         $gmt_timestamp = gmdate(DATE_RFC1123, $timestamp);
@@ -134,7 +135,7 @@ class Pages extends \LimeExtra\Controller {
             $this->app->stop();
         }
 
-        header("Content-Type: image/{$ext}");
+        header("Content-Type: image/" . ($ext == 'svg' ? 'svg+xml' : $ext));
         header('Content-Length: '.$this->app->filestorage->getSize($thumbpath));
         header('Last-Modified: ' . $gmt_timestamp);
         header('Expires: ' . gmdate(DATE_RFC1123, time() + 31556926));
