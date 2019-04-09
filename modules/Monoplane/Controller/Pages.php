@@ -8,6 +8,7 @@ class Pages extends \LimeExtra\Controller {
 
         $this->mp = array_replace_recursive([
             'id' => '_id',
+            '_id' => '',
             'pages' => 'pages',
             'site' => [],
         ],$this->retrieve('monoplane', []));
@@ -47,13 +48,41 @@ class Pages extends \LimeExtra\Controller {
             return false;
 
         }
+        
+        $collection = $this->module('collections')->collection($this->mp['pages']);
 
-        // replace relative links in wysiwyg field if site is in subdirectory
-        if (!empty($page['content']) && MP_BASE_URL !== '' && strpos($page['content'], 'href="/') !== false) {
-            $page['content'] = $this->replaceRelativeLinksInHTML($page['content']);
+        $fields = [];
+        foreach ($collection['fields'] as $field) {
+            $fields[$field['name']] = $field;
         }
+        
+        $type = $fields['content']['type'];
+        if (in_array($type, ['__construct', '__call', '__invoke', '__get', 'initialize']))
+            $type = 'index';
+
+        $options = $fields['content']['options'] ?? [];
+
+        // render content
+        $page['content'] = (new \Monoplane\Helper\Fields($this->app))->$type($page['content'], $options);
 
         $this->mp['_id'] = $slug;
+
+        // experimental: return rendered html (static) instead of rendered php (Lexy)
+        if (isset($this->mp['static']) && $this->mp['static']) {
+
+            $hash = $slug . '_' . md5(json_encode($this->mp)) . '.html';
+
+            if ($this->app->path('#tmp:'.$hash)) {
+                return $this->app->filestorage->read('tmp://'.$hash);
+            }
+
+            $output = $this->render('views:index.php', ['mp' => $this->mp, 'page' => $page]);
+
+            $this->app->filestorage->write('tmp://'.$hash, $output);
+
+            return $output;
+
+        }
 
         return $this->render('views:index.php', ['mp' => $this->mp, 'page' => $page]);
 
@@ -177,30 +206,6 @@ class Pages extends \LimeExtra\Controller {
         }
 
         return $this->app->module('collections')->find($collection, $options);
-
-    }
-
-    protected function replaceRelativeLinksInHTML($html) {
-
-            $dom = new \DomDocument();
-
-            // inspired by https://stackoverflow.com/a/45680712 and
-            // https://stackoverflow.com/questions/4879946/how-to-savehtml-of-domdocument-without-html-wrapper#comment86181089_45680712
-
-            $dom->loadHTML('<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $html . '</body></html>');
-
-            $anchors = $dom->getElementsByTagName('a');
-
-            foreach ($anchors as $a) {
-
-                $href = $a->getAttribute('href');
-
-                if (strpos($href, '/') === 0)
-                    $a->setAttribute('href', MP_BASE_URL.$href);
-
-            }
-
-            return substr(trim($dom->saveHTML()),199,-14);
 
     }
 
