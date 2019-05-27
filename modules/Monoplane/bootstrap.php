@@ -76,6 +76,10 @@ $this->renderer->extend(function($content){ // returns relative url of scaled im
     return preg_replace('/(\s*)@image\((.+?)\)/', '$1<?php echo MP_BASE_URL."/getImage?src=".urlencode($2)."&w=".$app->retrieve("monoplane/lexy/image/width", 800)."&h=".$app->retrieve("monoplane/lexy/image/height", 800)."&q=".$app->retrieve("monoplane/lexy/image/quality", 80)."&m=".$app->retrieve("monoplane/lexy/image/mode", "bestFit"); ?>', $content);
 });
 
+$this->renderer->extend(function($content){ // returns relative url of scaled image (headerimage)
+    return preg_replace('/(\s*)@headerimage\((.+?)\)/', '$1<?php echo MP_BASE_URL."/getImage?src=".urlencode($2)."&w=".$app->retrieve("monoplane/lexy/headerimage/width", 800)."&h=".$app->retrieve("monoplane/lexy/headerimage/height", 400)."&q=".$app->retrieve("monoplane/lexy/headerimage/quality", 80)."&m=".$app->retrieve("monoplane/lexy/headerimage/mode", "thumbnail"); ?>', $content);
+});
+
 // error handling
 $this->on('after', function() {
 
