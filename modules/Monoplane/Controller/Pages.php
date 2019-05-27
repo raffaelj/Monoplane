@@ -151,7 +151,7 @@ class Pages extends \LimeExtra\Controller {
 
         $thumbpath = $this->module('cockpit')->thumbnail($options);
 
-        $ext = pathinfo($thumbpath, PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($thumbpath, PATHINFO_EXTENSION));
 
         $store = $ext == 'svg' ? 'uploads://' : 'thumbs://';
         $thumbpath = $store . '/' . str_replace($this->app->filestorage->getUrl($store), '', $thumbpath);
@@ -164,7 +164,9 @@ class Pages extends \LimeExtra\Controller {
             $this->app->stop();
         }
 
-        header("Content-Type: image/" . ($ext == 'svg' ? 'svg+xml' : $ext));
+        $mime = \Lime\App::$mimeTypes[$ext];
+
+        header("Content-Type: " . $mime);
         header('Content-Length: '.$this->app->filestorage->getSize($thumbpath));
         header('Last-Modified: ' . $gmt_timestamp);
         header('Expires: ' . gmdate(DATE_RFC1123, time() + 31556926));
