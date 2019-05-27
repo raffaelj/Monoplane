@@ -257,7 +257,7 @@ See [LICENSE][11] for more information.
 
 ## Credits and third party resources
 
-Without Cockpit, Monoplane couldn't exist. Thanks  to [Artur Heinze][7] and to all [contributors][8].
+Without Cockpit, Monoplane couldn't exist. Thanks to [Artur Heinze][7] and to all [contributors][8].
 
 I used [highlight.js][9] for code highlighting on the demo page on startup, which is released under the [BSD License][10].
 
