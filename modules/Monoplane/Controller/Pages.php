@@ -22,33 +22,56 @@ class Pages extends \LimeExtra\Controller {
     // follow the naming convention of Cockpit and name it 'index'
     public function index($slug = '') {
 
-        $options = [
-            'filter' => [
-                $this->mp['id'] => $slug,
-                'published' => true,
-            ],
-        ];
+        if (strpos($slug, '/')) { // sub pages - call different collections
 
-        if (empty($slug)) { // start page
-            $options = [
-                'filter' => [
-                    'is_startpage' => true,
-                    'published' => true
-                ],
-            ];
+            $parts = explode('/', $slug);
+
+            $subCollections = $this->mp['collections'] ?? false;
+            if ($subCollections
+                && ($subCollections == 'all' || in_array($parts[0], $subCollections))
+                && $this->module('collections')->exists($parts[0])
+                ) {
+                $this->mp['pages'] = $parts[0];
+                $this->mp['subpage'] = $parts[0];
+                $slug = $parts[1];
+            } else return false;
+
         }
 
-        if (!$page = $this->app->module('collections')->findOne($this->mp['pages'], $options['filter'], null, false, ['lang' => $this('i18n')->locale])) {
+        if (empty($slug)) { // start page
+            $filter = [
+                'is_startpage' => true,
+                'published' => true
+            ];
+        } else {
 
-            if (!$this->app->module('collections')->exists($this->mp['pages'])) {
-                include(MP_DOCS_ROOT.'/modules/Monoplane/demo.php');
-                return $this->render('views:demo.php', ['mp' => $this->mp]);
+            $filter = [
+                'published' => true,
+            ];
+
+            if ($this->retrieve('monoplane/multilingual')) {
+
+                $lang = $this('i18n')->locale;
+                $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
+
+                if ($this->mp['id'] != '_id' && $this->isLocalized() && $lang != $defaultLang) {
+                    $filter[$this->mp['id'].'_'.$lang] = $slug;
+                } else {
+                    $filter[$this->mp['id']] = $slug;
+                }
+
+            } else {
+                $filter[$this->mp['id']] = $slug;
             }
+
+        }
+
+        if (!$page = $this->app->module('collections')->findOne($this->mp['pages'], $filter, null, false, ['lang' => $this('i18n')->locale])) {
 
             return false;
 
         }
-        
+
         $collection = $this->module('collections')->collection($this->mp['pages']);
 
         $fields = [];
@@ -67,8 +90,13 @@ class Pages extends \LimeExtra\Controller {
 
         $this->mp['_id'] = $slug;
 
+        $view = 'views:index.php';
+        if ($path = $this->app->path('views:'.$this->mp['pages'].'.php')) {
+            $view = $path;
+        }
+
         // experimental: return rendered html (static) instead of rendered php (Lexy)
-        if (isset($this->mp['static']) && $this->mp['static']) {
+        if (isset($this->mp['static']) && $this->mp['static'] == true) {
 
             $hash = $slug . '_' . md5(json_encode($this->mp)) . '.html';
 
@@ -76,7 +104,7 @@ class Pages extends \LimeExtra\Controller {
                 return $this->app->filestorage->read('tmp://'.$hash);
             }
 
-            $output = $this->render('views:index.php', ['mp' => $this->mp, 'page' => $page]);
+            $output = $this->render($view, ['mp' => $this->mp, 'page' => $page]);
 
             $this->app->filestorage->write('tmp://'.$hash, $output);
 
@@ -84,7 +112,7 @@ class Pages extends \LimeExtra\Controller {
 
         }
 
-        return $this->render('views:index.php', ['mp' => $this->mp, 'page' => $page]);
+        return $this->render($view, ['mp' => $this->mp, 'page' => $page]);
 
     }
 
@@ -137,7 +165,7 @@ class Pages extends \LimeExtra\Controller {
                 if ($asset) $ext = str_replace('image/', '', $asset['mime']);
             }
             else {
-                $ext = pathinfo($options['src'], PATHINFO_EXTENSION);
+                $ext = strtolower(pathinfo($options['src'], PATHINFO_EXTENSION));
             }
 
             if (( $ext == 'png' || $ext == 'gif' ) && in_array($options['mode'], ['thumbnail', 'bestFit', 'resize', 'crop'])) {
@@ -197,17 +225,39 @@ class Pages extends \LimeExtra\Controller {
                 ],
             ];
 
-            // language filter doesn't work with fields projection
-            // quick fix to make it work
-            $lang = $this('i18n')->locale !== 'en' ? '_' . $this('i18n')->locale : '';
-            if (!empty($lang)) {
-                $options['lang'] = $this('i18n')->locale;
-                $options['fields']['title'.$lang] = true;
+            if ($this->retrieve('monoplane/multilingual')) {
+
+                $lang = $this('i18n')->locale;
+                $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
+
+                $options['lang'] = $lang;
+
+                if ($lang != $defaultLang) {
+                    $options['fields']['title_'.$lang] = true;
+                    if ($this->mp['id'] != '_id') {
+                        $options['fields'][$this->mp['id'].'_'.$lang] = true;
+                    }
+                }
+
             }
 
         }
 
         return $this->app->module('collections')->find($collection, $options);
+
+    }
+
+    protected function isLocalized() {
+
+        if (isset($this->app['modules']['uniqueslugs'])) {
+
+            return $this->retrieve('unique_slugs/localize/'.$this->mp['pages'], false);
+
+        }
+
+        // to do: other possible methods to localize slugs...
+
+        return false;
 
     }
 

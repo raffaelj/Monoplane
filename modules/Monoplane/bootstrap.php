@@ -36,16 +36,6 @@ $this->set('monoplane.assets.top', [
     MP_BASE_URL.'/modules/Monoplane/assets/css/style.min.css', // main style file
 ]);
 
-// init + load i18n
-$this('i18n')->locale = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
-$locale = $this->param('lang') ?? $_SESSION['lang'] ?? $this('i18n')->locale;
-$this('i18n')->locale = $locale;
-$this->set('monoplane/i18n', $locale);
-
-if ($translationspath = $this->path("mp_config:i18n/{$locale}.php")) {
-    $this('i18n')->load($translationspath, $locale);
-}
-
 // bind routes
 $this->bind('/login', function() {
     $this->reroute(MP_ADMINFOLDER);
@@ -55,9 +45,54 @@ $this->bind('/getImage', function() {
     return $this->invoke('Monoplane\\Controller\\Pages', 'getImage');
 });
 
-$this->bind('/:slug', function($params) {
-    return $this->invoke('Monoplane\\Controller\\Pages', 'index', ['slug' => $params['slug']]);
-});
+$isMultilingual = $this->retrieve('monoplane/multilingual', false) && ($languages = $this->retrieve('languages', false));
+$useCustomRoutes = $this->retrieve('monoplane/customroutes', false);
+
+if (!$useCustomRoutes) {
+
+    $this->bind('/*', function($params) {
+        return $this->invoke('Monoplane\\Controller\\Pages', 'index', ['slug' => $params[':splat'][0]]);
+    }, !$isMultilingual);
+
+    if ($isMultilingual) {
+
+        $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
+
+        foreach($languages as $languageCode => $name) {
+
+            if ($languageCode == 'default') $lang = $defaultLang;
+            else $lang = $languageCode;
+
+            $this->bind('/'.$lang.'/*', function($params) use($lang) {
+
+                $this('i18n')->locale = $lang;
+                $this->set('base_url', MP_BASE_URL . '/' . $lang);
+
+                // init + load i18n
+                if ($translationspath = $this->path("mp_config:i18n/{$lang}.php")) {
+                    $this('i18n')->load($translationspath, $lang);
+                }
+
+                return $this->invoke('Monoplane\\Controller\\Pages', 'index', ['slug' => ($params[':splat'][0] ?? '')]);
+
+            });
+
+        }
+
+        $this->bind('/*', function($params) use($languages, $defaultLang) {
+
+            $lang = $this->getClientLang($defaultLang);
+
+            if (!array_key_exists($lang, $languages)) {
+                $lang = $defaultLang;
+            }
+            $this->reroute('/' . $lang . '/' . ($params[':splat'][0] ?? ''));
+
+        });
+
+    }
+
+}
 
 // extend lexy parser for custom image resizing
 $this->renderer->extend(function($content){ // returns relative url of scaled logo
