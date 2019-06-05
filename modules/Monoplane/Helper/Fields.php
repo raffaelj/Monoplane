@@ -89,8 +89,13 @@ class Fields extends \Lime\Helper {
 
             $href = $a->getAttribute('href');
 
-            if (strpos($href, '/') === 0 && strpos($href, '//') === false)
-                $a->setAttribute('href', MP_BASE_URL.$href);
+            if (strpos($href, '/') === 0 && strpos($href, '//') === false) {
+
+                // to do: compare with language prefix
+
+                $a->setAttribute('href', $this->app->baseUrl($href));
+
+            }
 
         }
 
