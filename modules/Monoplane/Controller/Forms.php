@@ -1,5 +1,14 @@
 <?php
 
+// to do:
+//  * remove spaghetti code and use templates instead
+//  * cleanup
+//  * add more field types
+//    * multipleselect
+//    * file uploads
+//    * ...
+// * think about i18n - the current method is to translate labels with global defined i18n strings
+
 namespace Monoplane\Controller;
 
 class Forms extends \LimeExtra\Controller {
@@ -316,7 +325,7 @@ class Forms extends \LimeExtra\Controller {
 
     protected function seriousError($fields, $response) {
 
-        // display errors from validator or from Mailer Exceptions (coming soon)
+        // display errors from validator or from Mailer Exceptions
 
         if (!isset($response['error'])) return false;
 
