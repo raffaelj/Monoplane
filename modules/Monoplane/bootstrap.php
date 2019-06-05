@@ -28,6 +28,10 @@ spl_autoload_register(function($class){
 include_once(__DIR__.'/Helper/MP.php'); // because auto-load not ready yet
 $this->helpers['mp'] = 'Monoplane\\Helper\\MP';
 
+// contact form helper
+$this->helpers['form'] = 'Monoplane\\Controller\\Forms';
+$this->bindClass('Monoplane\\Controller\\Forms', 'forms');
+
 // pass custom layout file to LimeExtra
 $this->layout = 'views:monoplane.php';
 
