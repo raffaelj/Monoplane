@@ -54,52 +54,59 @@ $this->bind('/getImage', function() {
     return $this->invoke('Monoplane\\Controller\\Pages', 'getImage');
 });
 
-$isMultilingual = $this->retrieve('monoplane/multilingual', false) && ($languages = $this->retrieve('languages', false));
 $useCustomRoutes = $this->retrieve('monoplane/customroutes', false);
 
 if (!$useCustomRoutes) {
 
-    $this->bind('/*', function($params) {
-        return $this->invoke('Monoplane\\Controller\\Pages', 'page', ['slug' => $params[':splat'][0]]);
-    }, !$isMultilingual);
+    // Bind wildcard routes at the end - otherwise defined routes in
+    // config/bootstrap.php won't have any effect
+    $this->on('monoplane.init', function() {
 
-    if ($isMultilingual) {
+        $isMultilingual = $this->retrieve('monoplane/multilingual', false) && ($languages = $this->retrieve('languages', false));
 
-        $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
+        $this->bind('/*', function($params) {
+            return $this->invoke('Monoplane\\Controller\\Pages', 'page', ['slug' => $params[':splat'][0]]);
+        }, !$isMultilingual);
 
-        foreach($languages as $languageCode => $name) {
+        if ($isMultilingual) {
 
-            if ($languageCode == 'default') $lang = $defaultLang;
-            else $lang = $languageCode;
+            $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
 
-            $this->bind('/'.$lang.'/*', function($params) use($lang) {
+            foreach($languages as $languageCode => $name) {
 
-                $this('i18n')->locale = $lang;
-                $this->set('base_url', MP_BASE_URL . '/' . $lang);
+                if ($languageCode == 'default') $lang = $defaultLang;
+                else $lang = $languageCode;
 
-                // init + load i18n
-                if ($translationspath = $this->path("mp_config:i18n/{$lang}.php")) {
-                    $this('i18n')->load($translationspath, $lang);
+                $this->bind('/'.$lang.'/*', function($params) use($lang) {
+
+                    $this('i18n')->locale = $lang;
+                    $this->set('base_url', MP_BASE_URL . '/' . $lang);
+
+                    // init + load i18n
+                    if ($translationspath = $this->path("mp_config:i18n/{$lang}.php")) {
+                        $this('i18n')->load($translationspath, $lang);
+                    }
+
+                    return $this->invoke('Monoplane\\Controller\\Pages', 'page', ['slug' => ($params[':splat'][0] ?? '')]);
+
+                });
+
+            }
+
+            $this->bind('/*', function($params) use($languages, $defaultLang) {
+
+                $lang = $this->getClientLang($defaultLang);
+
+                if (!array_key_exists($lang, $languages)) {
+                    $lang = $defaultLang;
                 }
-
-                return $this->invoke('Monoplane\\Controller\\Pages', 'page', ['slug' => ($params[':splat'][0] ?? '')]);
+                $this->reroute('/' . $lang . '/' . ($params[':splat'][0] ?? ''));
 
             });
 
         }
 
-        $this->bind('/*', function($params) use($languages, $defaultLang) {
-
-            $lang = $this->getClientLang($defaultLang);
-
-            if (!array_key_exists($lang, $languages)) {
-                $lang = $defaultLang;
-            }
-            $this->reroute('/' . $lang . '/' . ($params[':splat'][0] ?? ''));
-
-        });
-
-    }
+    });
 
 }
 
