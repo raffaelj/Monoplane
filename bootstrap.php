@@ -5,12 +5,12 @@
  * @see       https://github.com/raffaelj/Monoplane
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.2.3
+ * @version   0.2.4
  * @author    Raffael Jesche
  * @license   MIT
  * @note      work in progress
  */
-$version = '0.2.3';
+$version = '0.2.4';
 
 // check for custom defines
 if (file_exists(__DIR__.'/defines.php')) {
