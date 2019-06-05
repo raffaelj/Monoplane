@@ -51,7 +51,7 @@ $useCustomRoutes = $this->retrieve('monoplane/customroutes', false);
 if (!$useCustomRoutes) {
 
     $this->bind('/*', function($params) {
-        return $this->invoke('Monoplane\\Controller\\Pages', 'index', ['slug' => $params[':splat'][0]]);
+        return $this->invoke('Monoplane\\Controller\\Pages', 'page', ['slug' => $params[':splat'][0]]);
     }, !$isMultilingual);
 
     if ($isMultilingual) {
@@ -73,7 +73,7 @@ if (!$useCustomRoutes) {
                     $this('i18n')->load($translationspath, $lang);
                 }
 
-                return $this->invoke('Monoplane\\Controller\\Pages', 'index', ['slug' => ($params[':splat'][0] ?? '')]);
+                return $this->invoke('Monoplane\\Controller\\Pages', 'page', ['slug' => ($params[':splat'][0] ?? '')]);
 
             });
 

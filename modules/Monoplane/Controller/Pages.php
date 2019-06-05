@@ -10,6 +10,7 @@ class Pages extends \LimeExtra\Controller {
             'id' => '_id',
             '_id' => '',
             'pages' => 'pages',
+            'posts' => 'posts',
             'site' => [],
         ],$this->retrieve('monoplane', []));
 
@@ -19,21 +20,35 @@ class Pages extends \LimeExtra\Controller {
 
     }
 
-    // follow the naming convention of Cockpit and name it 'index'
     public function index($slug = '') {
+        return $this->page($slug);
+    }
+
+    public function page($slug = '') {
 
         if (strpos($slug, '/')) { // sub pages - call different collections
 
             $parts = explode('/', $slug);
 
-            $subCollections = $this->mp['collections'] ?? false;
-            if ($subCollections
-                && ($subCollections == 'all' || in_array($parts[0], $subCollections))
-                && $this->module('collections')->exists($parts[0])
+            $subPages = $this->mp['public_routes'] ?? false;
+            if ($subPages
+                && ($subPages == 'all' || array_key_exists($parts[0], $subPages))
+                && $this->module('collections')->exists($subPages[$parts[0]])
                 ) {
-                $this->mp['pages'] = $parts[0];
-                $this->mp['subpage'] = $parts[0];
-                $slug = $parts[1];
+
+                // pagination for blog module
+                if ((int)$parts[1]) {
+                    $slug = $parts[0];
+                    $_REQUEST['page'] = $parts[1];
+                }
+
+                // sub page in different collection
+                else {
+                    $this->mp['pages'] = $subPages[$parts[0]];
+                    $this->mp['subpage'] = $subPages[$parts[0]];
+                    $slug = $parts[1];
+                }
+
             } else return false;
 
         }
@@ -87,6 +102,12 @@ class Pages extends \LimeExtra\Controller {
 
         // render content
         $page['content'] = (new \Monoplane\Helper\Fields($this->app))->$type($page['content'], $options);
+        
+        if (isset($page['add_blog_module']) && $page['add_blog_module'] == true) {
+            
+            $page['blog_module'] = $this->posts();
+            
+        }
 
         $this->mp['_id'] = $slug;
 
@@ -116,13 +137,82 @@ class Pages extends \LimeExtra\Controller {
 
     }
 
+    public function posts() {
+
+        $_collection = $this->module('collections')->collection($this->mp['posts']);
+
+        if (!$_collection) return false;
+        
+        $page = $this->param('page', 1);
+
+        $limit = $this->retrieve('monoplane/blog_module/pagination', 10);
+        $skip = ($page - 1) * $limit;
+
+        $options = [
+            'filter' => [
+                'published' => true,
+            ],
+            'lang'  => $this('i18n')->locale,
+            'limit' => $limit,
+            'skip'  => $skip,
+        ];
+
+        $posts = $this->app->module('collections')->find($this->mp['posts'], $options);
+
+        if (!$posts) {
+            $this->app->response->status = 404;
+            return;
+        }
+
+        $fields = [];
+        foreach ($_collection['fields'] as $field) {
+            $fields[$field['name']] = $field;
+        }
+
+        $type = $fields['content']['type'];
+        if (in_array($type, ['__construct', '__call', '__invoke', '__get', 'initialize']))
+            $type = 'index';
+
+        $posts_options = $fields['content']['options'] ?? [];
+
+        if (!empty($posts)) {
+            foreach($posts as &$entry) {
+
+                if (!empty($entry['excerpt'])) {
+                    $entry['excerpt'] = (new \Monoplane\Helper\Fields($this->app))->$type($entry['excerpt'], $posts_options);
+                }
+
+                // skip this step if excerpt is present
+                elseif (!empty($entry['content'])) {
+                    $entry['content'] = (new \Monoplane\Helper\Fields($this->app))->$type($entry['content'], $posts_options);
+                }
+
+            }
+
+        }
+
+        // pagination
+        $count = $this->app->module('collections')->count($this->mp['posts'], $options['filter']);
+
+        return [
+            'posts' => $posts,
+            'pagination' => [
+                'count' => $count,
+                'page' => $page,
+                'limit' => $limit,
+                'pages' => ceil($count / $limit),
+            ]
+        ];
+
+    }
+
     public function error($status = '') {
 
         // To do: 401, 500
 
         switch ($status) {
             case '404':
-                return $this->render('views:errors/404.php', ['mp' => $this->mp]);
+                return $this->render('views:errors/404.php', ['mp' => $this->mp, 'page' => []]);
                 break;
         }
 
