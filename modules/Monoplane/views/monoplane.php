@@ -16,6 +16,9 @@
 
         <link rel="shortcut icon" href="{{ MP_BASE_URL }}/favicon.png?ver={{ $version }}">
 
+        <script>
+            var MP_BASE_URL = '{{ MP_BASE_URL }}';
+        </script>
         {{ $app->assets($app['monoplane.assets.top'], $version) }}
         {{ $app('mp')->userStyles() }}
 
@@ -25,22 +28,20 @@
 
         <header>
 
-            <a href="{{ MP_BASE_URL }}/">
+            <a href="@base('/')">
 @if(!empty($site['logo']))
                 <img class="logo" alt="{{ $site['logo']['title'] ?? 'logo' }}" src="@logo($site['logo']['_id'] ?? $site['logo']['path'])" title="@lang('back to start page')" />
 @endif
                 <h1>{{ $site['site_name'] ?? $app['app.name'] }}</h1>
             </a>
 
+            @render('views:partials/language-switch.php', ['mp' => $mp, 'page' => $page])
+
         </header>
 
         @render('views:partials/nav.php', ['mp' => $mp, 'type' => 'main'])
 
-        <main id="main">
-
-            {{ $content_for_layout }}
-
-        </main>
+        {{ $content_for_layout }}
 
         <footer>
             @render('views:partials/nav.php', ['mp' => $mp, 'type' => 'footer'])
@@ -49,6 +50,8 @@
 
         {{ $app->assets($app['monoplane.assets.bottom'], $version) }}
         {{ $app('mp')->userScripts() }}
+
+        @render('views:partials/privacy-notice.php', ['mp' => $mp])
 
     </body>
 
