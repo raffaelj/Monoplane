@@ -38,6 +38,11 @@ $this->layout = 'views:monoplane.php';
 // add assets
 $this->set('monoplane.assets.top', [
     MP_BASE_URL.'/modules/Monoplane/assets/css/style.min.css', // main style file
+    MP_BASE_URL.'/modules/Monoplane/assets/lib/wa-mediabox/wa-mediabox.min.css' // gallery lightbox
+]);
+$this->set('monoplane.assets.bottom', [
+    MP_BASE_URL.'/modules/Monoplane/assets/lib/wa-mediabox/wa-mediabox.min.js', // gallery lightbox
+    MP_BASE_URL.'/modules/Monoplane/assets/js/mp.js',          // Monoplane js
 ]);
 
 // bind routes
