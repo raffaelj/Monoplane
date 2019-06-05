@@ -35,6 +35,26 @@ Now login with admin/admin, change your password and start your work.
 
 If you don't like clicking, use the CLI commands. Scroll down or [click here](#fast-cli-installation) ;-).
 
+## Recommended Addons
+
+Install these addons in `cockpit/addons/`. Maybe I'll bundle them all together in MonoplaneGUI in the future.
+
+* [MonoplaneGUI][14]
+  * coming soon
+* [UniqueSlugs][3]
+  * If links should point to `slug` instead of `_id`
+  * for multilingual slugs in language switch
+* [rljUtils][15]
+  * fixes security issues in Admin UI for multi user setups
+  * big language buttons for multilingual setups
+* [FormValidation][4]
+  * The inbuilt Forms Controller requires field definitions from this addon
+  * The inbuilt views and css files are written to match the field definitions
+* [EditorFormats][5]
+  * if you want to give your users a Wysiwyg field
+* [VideoLinkField][13]
+  * inbuilt `/assets/js/mp.js`, views and css files are designed to load videos privacy friendly with a privacy notice, that pops up only when a user clicks a play button
+
 ## Settings
 
 The fastest way to change some defaults, is to add some values to `MP_DOCS_ROOT/cockpit/config/config.yaml`:
@@ -44,12 +64,29 @@ monoplane:
     id: slug                    # the field name for slugs, default: _id
     i18n: de                    # default: cockpit i18n or en
     pages: collection_name      # collection name for pages, default: pages
+    multilingual: true          # default: false
+    public_routes:              # for sub pages and blog module
+        blog: posts             # /blog points to posts collection
+    blog_module:
+        pagination: 5
     site:
         site_name: My Site      # site name
         description: for SEO    # fallback if no page description exists
         logo:
             _id: asset_id       # asset id or asset path
             path: /img/logo.png # or a path relative to your base
+    privacy_notice:             # link to privacy notice page
+        route: /privacy-notice
+        route_de: /datenschutzerklaerung        # use suffixes
+        route_fr: /charte-de-confidentialite    # for multilingual sites
+    contactform:                # uses Post/Redirect/Session method
+        form: contact           # default: contact
+        route: /contact         # fallback for redirect if HTTP_REFERER is disabled
+        anchor: "#contact"      # redirect with anchor to prevent scrolling
+        success_route: /success # redirect to same page if omitted
+        submit_route: /cart     # redirect to same page if omitted
+        session.expire: 60      # default: 60
+        session.name: form      # default: md5(__DIR__)
     lexy:                       # Monoplane extends the Lexy renderer
         logo:                   # @logo('assets_id or path')
             width: 200
@@ -58,6 +95,9 @@ monoplane:
         thumbnail:              # @thumbnail('assets_id or path')
             width: 100
             height: 100
+        headerimage:            # @headerimage('assets_id or path')
+            width: 800
+            height: 200
         image:                  # @image('assets_id or path')
             width: 800
 ```
@@ -120,6 +160,7 @@ Change `MP_DOCS_ROOT/cockpit/config/config.yaml` to
 ```yaml
 monoplane:
     i18n: de
+    multilingual: true
 ```
 
 or build your own logic to change the current language.
@@ -259,7 +300,9 @@ See [LICENSE][11] for more information.
 
 Without Cockpit, Monoplane couldn't exist. Thanks to [Artur Heinze][7] and to all [contributors][8].
 
-I used [highlight.js][9] for code highlighting on the demo page on startup, which is released under the [BSD License][10].
+I used [highlight.js][9] ([authors][19]) for code highlighting on the demo page on startup, which is released under the [BSD License][10].
+
+I used [wa-mediabox][16] from [Jiří Hýbek][18] for gallery lightboxes, which is released under the [MIT License][17]. It is a lightweight lightbox without jQuery.
 
 
 [1]: https://github.com/agentejo/cockpit/
@@ -274,3 +317,10 @@ I used [highlight.js][9] for code highlighting on the demo page on startup, whic
 [10]: https://github.com/highlightjs/highlight.js/blob/master/LICENSE
 [11]: https://github.com/raffaelj/Monoplane/blob/master/LICENSE
 [12]: https://monoplane.rlj.me
+[13]: https://github.com/raffaelj/cockpit_VideoLinkField
+[14]: https://github.com/raffaelj/MonoplaneGUI
+[15]: https://github.com/raffaelj/cockpit_rljUtils
+[16]: https://github.com/jirihybek/wa-mediabox
+[17]: https://github.com/jirihybek/wa-mediabox/blob/master/LICENSE
+[18]: https://github.com/jirihybek
+[19]: https://github.com/highlightjs/highlight.js/blob/master/AUTHORS.en.txt
