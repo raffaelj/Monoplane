@@ -1,0 +1,35 @@
+
+$color-darker: #222 !default;
+$color-white:  #fefefe !default;
+$color-main:   #470b7e !default;
+
+.gallery {
+    width: 100%;
+    text-align: center;
+    a {
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+    }
+}
+a.thumbs {
+    margin: .5em;
+    border-radius: 4px;
+    max-width: 90%;
+    padding: 8px;
+    background-color: $color-darker;
+    border: none;
+    img {
+        display: block;
+        width: 100px;
+        height: 100px;
+        border: 1px solid $color-white;
+    }
+    &:hover {
+        background-color: $color-main;
+        border: none;
+        img {
+            @include filter(none);
+        }
+    }
+}

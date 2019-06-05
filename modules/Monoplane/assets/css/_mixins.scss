@@ -1,20 +1,18 @@
-//// mixins
-
 // box-sizing
 @mixin box-sizing($box) {
   -webkit-box-sizing: $box;
      -moz-box-sizing: $box;
           box-sizing: $box;
 }
-// word-wrap
-@mixin word-wrap() {
+// hyphens
+@mixin hyphens() {
        word-break: break-word;
   -webkit-hyphens: auto;
      -moz-hyphens: auto;
           hyphens: auto;
 }
-@mixin no-word-wrap() {
-       word-break: unset;
+@mixin no-hyphens() {
+       word-break: normal;
   -webkit-hyphens: none;
      -moz-hyphens: none;
           hyphens: none;
@@ -23,28 +21,23 @@
 // box-shadow
 @mixin box-shadow($shadow...) {
 	-webkit-box-shadow: $shadow;
-	-moz-box-shadow: $shadow;
-	box-shadow: $shadow;
+     -moz-box-shadow: $shadow;
+          box-shadow: $shadow;
 }
 
 // filter
 @mixin filter($filter...) {
-    -webkit-filter: $filter;
-    -moz-filter: $filter;
-    -ms-filter: $filter;
-    -o-filter: $filter;
-    filter:$filter;
+  -webkit-filter: $filter;
+     -moz-filter: $filter;
+      -ms-filter: $filter;
+       -o-filter: $filter;
+          filter: $filter;
 }
 
-//// breakpoints
-@mixin breakpoint($point) {
-    @if $point == small {
-        @media (min-width: 500px) {@content;}
-    }
-    @if $point == medium {
-        @media (min-width: 760px) {@content;}
-    }
-    @if $point == normal {
-        @media (min-width: 1000px) {@content;}
-    }
+// transition
+@mixin transition($transition...) {
+	-webkit-transition: $transition;
+     -moz-transition: $transition;
+       -o-transition: $transition;
+          transition: $transition;
 }
