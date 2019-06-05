@@ -27,7 +27,7 @@
 
         {{ $fields }}
 
-        <input name="submit" type="submit" value="@lang('Send')" />
+        <div><input name="submit" type="submit" value="@lang('Send')" /></div>
     </fieldset>
 
 </form>

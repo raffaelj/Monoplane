@@ -48,6 +48,9 @@ fieldset {
       margin: 0 0 .5rem;
       padding: 0;
       vertical-align: top;
+      &:last-of-type { // contains submit button
+          text-align: center;
+      }
       @include breakpoint(medium) {
           width: 100%;
           float: left;
