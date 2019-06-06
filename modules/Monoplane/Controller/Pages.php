@@ -256,29 +256,6 @@ class Pages extends \LimeExtra\Controller {
             $options['filters']['blur'] = ['type' => 'gaussian', 'passes' => intval($this->param('blur', 5))];
         }
 
-        // quick fix to prevent black backgrounds on servers with none-bundled gd
-        // as soon as SimpleImage calls two methods, e. g. crop+resize, on a 
-        // transparent image, the alpha channel gets destroyed
-        // see https://github.com/claviska/SimpleImage/issues/236 for more info
-        if (GD_BUNDLED === 0) {
-
-            $ext = '';
-            $src = $options['src'];
-            if (strpos($src, '.') === false) {
-                $asset = $this->app->storage->findOne('cockpit/assets', ['_id' => $src], ['mime' => true]);
-                if ($asset) $ext = str_replace('image/', '', $asset['mime']);
-            }
-            else {
-                $ext = strtolower(pathinfo($options['src'], PATHINFO_EXTENSION));
-            }
-
-            if (( $ext == 'png' || $ext == 'gif' ) && in_array($options['mode'], ['thumbnail', 'bestFit', 'resize', 'crop'])) {
-                $options['mode'] = 'fitToWidth';
-                $options['filters'] = null;
-            }
-
-        }
-
         // return $this->module('cockpit')->thumbnail($options); // browser caching didn't work anymore
 
         $thumbpath = $this->module('cockpit')->thumbnail($options);
