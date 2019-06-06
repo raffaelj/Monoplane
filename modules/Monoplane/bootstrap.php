@@ -134,8 +134,28 @@ $this->renderer->extend(function($content){ // returns relative url of scaled im
 // error handling
 $this->on('after', function() {
 
-    if (!$this->response->body || $this->response->body === 404)
+    // maintenance mode
+    if (($m = $this->retrieve('monoplane/maintenance', null))
+        && ($m['active'] ?? false)) {
+        $allowed = false;
+        if (!empty($m['allowed_ips'])) {
+            $ips = explode(' ', trim($m['allowed_ips']));
+            if (in_array($this->getClientIp(), $ips)) {
+                $allowed = true;
+            }
+        }
+        if (!$allowed) {
+            $this->response->status = 503;
+            $this->response->headers['Retry-After'] = '3600';
+            $this->layout = null;
+            $this->response->body = $this->view('views:errors/503-maintenance.php', ['site' => $this->retrieve('monoplane/site', [])]);
+        }
+    }
+
+    // force 404 if body is empty
+    if (!$this->response->body || $this->response->body === 404) {
         $this->response->status = 404;
+    }
 
     switch($this->response->status){
         case '404':
