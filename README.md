@@ -155,17 +155,9 @@ if ($translationspath = $this->path("#config:formvalidation/i18n/{$locale}.php")
 
 ## i18n
 
-Change `MP_DOCS_ROOT/cockpit/config/config.yaml` to
+Localization is complicated. It works now, but until the GUI addon is ready, you have to change a few settings by hand.
 
-```yaml
-monoplane:
-    i18n: de
-    multilingual: true
-```
-
-or build your own logic to change the current language.
-
-Adding the query parameter `?lang=de` to the called url changes the language, but it doesn't save it when clicking on another link without the query parameter. I'm not sure about the best logic for multilingual websites (usability, SEO etc.).
+A proper documentation is coming soon. I added an example config in [docs/i18n.md](/docs/i18n.md)
 
 For i18n strings of your base application add a language file to `MP_DOCS_ROOT/config/i18n/de.php`, e. g.:
 
