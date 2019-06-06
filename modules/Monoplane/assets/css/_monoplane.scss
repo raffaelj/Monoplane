@@ -124,6 +124,11 @@ body > nav {
     }
 }
 
+nav .active {
+    color: $color-dark;
+    background-color: transparent;
+}
+
 .language-switch {
     position: absolute;
     top: 1em;
