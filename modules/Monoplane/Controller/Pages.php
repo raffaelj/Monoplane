@@ -14,6 +14,8 @@ class Pages extends \LimeExtra\Controller {
             'site' => [],
         ],$this->retrieve('monoplane', []));
 
+        $this->mp['isMultilingual'] = $this->retrieve('monoplane/multilingual', false) && ($this->retrieve('languages', false));
+
         $this->mp['nav'] = $this->nav();
 
         $this->trigger('monoplane.pages.before', [&$this->mp]);
@@ -31,10 +33,21 @@ class Pages extends \LimeExtra\Controller {
             $parts = explode('/', $slug);
 
             $subPages = $this->mp['public_routes'] ?? false;
-            if ($subPages
-                && ($subPages == 'all' || array_key_exists($parts[0], $subPages))
+
+            if (($blogCollection = $this->mp['blog_module']['collection'] ?? false)
+                && ($blogRoutes = $this->mp['blog_module']['routes'] ?? false)) {
+
+                foreach($blogRoutes as $route) {
+                    $subPages[$route] = $blogCollection;
+                }
+            }
+
+            if (!empty($subPages)
+                && (array_key_exists($parts[0], $subPages))
                 && $this->module('collections')->exists($subPages[$parts[0]])
                 ) {
+
+                $this->mp['subPages'] = $subPages;
 
                 // pagination for blog module
                 if ((int)$parts[1]) {
@@ -64,7 +77,7 @@ class Pages extends \LimeExtra\Controller {
                 'published' => true,
             ];
 
-            if ($this->retrieve('monoplane/multilingual')) {
+            if ($this->mp['isMultilingual']) {
 
                 $lang = $this('i18n')->locale;
                 $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');
@@ -100,16 +113,16 @@ class Pages extends \LimeExtra\Controller {
 
         $options = $fields['content']['options'] ?? [];
 
+        $this->mp['_id'] = $slug;
+
         // render content
         $page['content'] = (new \Monoplane\Helper\Fields($this->app))->$type($page['content'], $options);
         
         if (isset($page['add_blog_module']) && $page['add_blog_module'] == true) {
-            
-            $page['blog_module'] = $this->posts();
-            
-        }
 
-        $this->mp['_id'] = $slug;
+            $page['blog_module'] = $this->posts();
+
+        }
 
         $view = 'views:index.php';
         if ($path = $this->app->path('views:'.$this->mp['pages'].'.php')) {
@@ -201,6 +214,7 @@ class Pages extends \LimeExtra\Controller {
                 'page' => $page,
                 'limit' => $limit,
                 'pages' => ceil($count / $limit),
+                'slug' => $this->mp['_id'],
             ]
         ];
 
@@ -315,7 +329,7 @@ class Pages extends \LimeExtra\Controller {
                 ],
             ];
 
-            if ($this->retrieve('monoplane/multilingual')) {
+            if ($this->mp['isMultilingual']) {
 
                 $lang = $this('i18n')->locale;
                 $defaultLang = $this->retrieve('monoplane/i18n') ?? $this->retrieve('i18n', 'en');

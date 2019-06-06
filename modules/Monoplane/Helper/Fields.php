@@ -69,8 +69,13 @@ class Fields extends \Lime\Helper {
  */
     public function replaceRelativeLinksInHTML($html) {
 
-        if(empty(MP_BASE_URL)) return $html;
-        
+        $isMultilingual = $this->retrieve('mp/isMultilingual', false);
+        $isInSubFolder = !empty(MP_BASE_URL);
+
+        if (!$isMultilingual && !$isInSubFolder) {
+            return $html;
+        }
+
         $dom = new \DomDocument();
 
         // inspired by https://stackoverflow.com/a/45680712 and

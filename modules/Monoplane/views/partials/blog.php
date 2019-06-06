@@ -7,7 +7,7 @@ $height = $app->retrieve('monoplane/lexy/thumbnail/height', 100) . 'px';
 @foreach($posts as $post)
             <article class="excerpt">
                 @if(!empty($post['title']))
-                <h3> <a href="@base('/blog/'. ($post['slug'] ?? $post['_id']))">{{ $post['title'] }}</a></h3>
+                <h3> <a href="@base($pagination['slug'].'/'. ($post['slug'] ?? $post['_id']))">{{ $post['title'] }}</a></h3>
                 @endif
 
                 @if(!empty($post['image']))
@@ -22,7 +22,7 @@ $height = $app->retrieve('monoplane/lexy/thumbnail/height', 100) . 'px';
                 {{ $post['content'] }}
                 @endif
 
-                <p class="read_more"><a href="@base('/blog/'. ($post['slug'] ?? $post['_id']))">@lang('read more...')</a></p>
+                <p class="read_more"><a href="@base($pagination['slug'].'/'. ($post['slug'] ?? $post['_id']))">@lang('read more...')</a></p>
 
             </article>
 @endforeach

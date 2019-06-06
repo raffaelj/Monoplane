@@ -34,11 +34,16 @@ foreach($app['languages'] as $languageCode => $name) {
     $entry = $app->module('collections')->findOne($mp['pages'], $filter, $projection, false, $fieldsFilter);
     if (isset($entry[$mp['id']])) $slug = $entry[$mp['id']];
 
+    $subpage = null;
+    if (isset($mp['subpage'])) {
+        $subpage = $app->retrieve('monoplane/blog_module/routes/route'.($lang == $defaultLang ? '' : '_'.$lang), null);
+    }
+
     $languages[] = [
         'code' => $lang,
         'name' => $name,
         'active' => $active,
-        'url' => MP_BASE_URL . '/' . $lang . '/' . (isset($mp['subpage']) ? $mp['subpage'] . '/' : '') . $slug,
+        'url' => MP_BASE_URL . '/' . $lang . '/' . ($subpage ? $subpage . '/' : '') . $slug,
     ];
 
 }
