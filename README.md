@@ -1,5 +1,15 @@
 # Monoplane
 
+**I decided, that the code base is ugly and I rewrote the whole thing.**
+
+> CpMultiplane is the refactored version of Monoplane. The code base was ugly, it was designed for very simple portfolio websites with a few pages and it didn't really support multilingual setups.
+
+If you used or use Monoplane and find bugs, I might fix them, but I will concentrate on [CpMultiplane][13]. The code base is cleaner, it supports multilingual pages by default and it has much more features...
+
+Most options from Monoplane will also work in CpMultiplane, but a lot of the config variables changed.
+
+--------------------------------------------------------------------------------
+
 Monoplane is a small PHP front end for the fast and headless [Cockpit CMS][1]. It is no Cockpit addon. Don't copy it in the cockpit addon folder. It is designed to use Cockpit as a library to keep the idea of having a headless CMS. When calling Cockpit directly (UI or API), it has no clue about Monoplane in the background.
 
 Monoplane is in alpha state. Some options may change, but I try my best to keep it backwards compatible. Feel free to file issues or to send pull requests.
@@ -274,3 +284,4 @@ I used [highlight.js][9] for code highlighting on the demo page on startup, whic
 [10]: https://github.com/highlightjs/highlight.js/blob/master/LICENSE
 [11]: https://github.com/raffaelj/Monoplane/blob/master/LICENSE
 [12]: https://monoplane.rlj.me
+[13]: https://github.com/raffaelj/CpMultiplane
